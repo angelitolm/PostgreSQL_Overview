@@ -1,4 +1,4 @@
--- Objetivos SBD 2PP
+-- Algunos Objetivos a vencer
 
 -- - Implememtar consultas de mediana y alta complejidad usando las sentencias del lenguaje SQL
 -- - Implementar vistas
@@ -64,8 +64,126 @@ Comando: REVOKE <groupname> FROM <role>
 Ejemplo: REVOKE developers FROM backend_services_2;
 
 
--------------------------------------------------------------------------------
-Ejercicios
+* CREATE USER <name> WITH [LOGIN PASSWORD SUPERUSER CREATEDB CREATEROLE CREATEUSER INHERIT]
+* CREATE ROLE <name> WITH [LOGIN PASSWORD SUPERUSER CREATEDB CREATEROLE CREATEUSER INHERIT]
+
+* GRANT <privileges_list | ALL PRIVILEGES> ON <table_name> TO <user>
+* GRANT <privileges_list | ALL PRIVILEGES> ON <table_name> TO <user | group | role> WITH GRANT OPTION -- permitir que los hijos hereden sus props
+* GRANT <group_privileges> TO <suer>;
+* GRANT UPDATE <table_field> ON TABLE <table_name> TO <user>;
+
+privileges_list = [SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES TRIGGER CREATE CONNECT TEMPORARY EXECUTE USAGE ALL]
+
+* REVOKE <privileges_list | ALL> ON <table_name> FROM [user, group, role] [CASCADE]
+
+* DROP OWNED BY <user>; -- quitar todas las relaciones que pueda tener un usuario para poder ser eliminado
+* DROP USER <user>; -- elimarn usuario
+
+-- **************************************************************************************************
+-- DML
+-- **************************************************************************************************
+* SELECT <columns> FROM <table_name> WHERE [condition];
+* INSERT INTO <table_name> (column1, column2, column3) VALUES (value1, value2, value3);
+* INSERT INTO <table_name_1> (column1, column2, column3) SELECT column1, column2, column3 FROM <table_name_2> WHERE [condition];
+
+* UPDATE <table_name> SET column1 = value1, column2 = value2...., columnN = valueN WHERE [condition];
+
+* DELETE FROM <table_name> WHERE [condition];
+
+* SELECT <columns>, COUNT(colum_a) FROM <table_name_1>
+JOIN <table_name_2> USING(colum_b)
+WHERE [condition]
+GROUP BY colum_a
+HAVING COUNT(colum_a) > (SELECT COUNT(colum_a) FROM <table_name_3> 
+WHERE [condition]
+ORDER BY colum_c [ASC | DESC];
+
+
+-- Transiciones SQL proporciona las siguientes funciones agregadas:
+APPROX_COUNT_DISTINCT
+AVG
+CHECKSUM_AGG
+COUNT
+COUNT_BIG
+GROUPING
+GROUPING_ID
+MAX
+MIN
+STDEV
+STDEVP
+STRING_AGG
+SUM
+VAR
+VARP
+
+
+
+-- **************************************************************************************************
+-- FUNCTINOS
+-- **************************************************************************************************
+CREATE FUNCTION <function_name>(.....)
+DECLARE
+
+<variables locales> <type> = <value>
+
+
+BEGIN
+  <instruction blocks>
+END;
+
+-- Conditions   
+IF <CONDITION>
+    THEN
+      <instruction blocks>
+    ELSE EXIT;
+END IF;
+
+-- Loops
+WHILE counter <= 100 LOOP
+
+END LOOP;
+
+
+
+-- **************************************************************************************************
+-- VIEWS
+-- **************************************************************************************************
+CREATE VIEW <view_name> (<params>)
+AS <query>
+
+
+
+-- **************************************************************************************************
+-- TRIGGERS
+-- **************************************************************************************************
+-- Sintaxis de una funcion trigger
+CREATE FUNCTION <trigger_function_name>()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+AS $$
+DECLARE
+
+BEGIN
+
+END;
+$$;
+
+
+-- Sintaxis de un trigger
+CREATE TRIGGER <trigger_name> 
+	[BEFORE | AFTER | INSTEAD OF] 
+	[INSERT OR UPDATE OR DELETE OR TRUNCATE] 
+ON <table_name>
+
+FOR EACH ROW
+<query> | EXECUTE PROCEDURE <function_trigger>();
+
+
+
+
+-- **************************************************************************************************
+-- Ejercicios Prácticos
+-- **************************************************************************************************
 
 Las relaciones siguientes, se corresponden con las tablas de la BD de una central 
 telefónica.
@@ -111,116 +229,9 @@ a los siguientes requerimientos:
 	CREATE GROUP clientes WITH SELECT ON TABLES SERVICIO_SUPLEMENTARIO AND CLIENTE_SERVICIO;
 
 
-
-
-
-
-DCL
-* CREATE USER <name> WITH [LOGIN PASSWORD SUPERUSER CREATEDB CREATEROLE CREATEUSER INHERIT]
-* CREATE ROLE <name> WITH [LOGIN PASSWORD SUPERUSER CREATEDB CREATEROLE CREATEUSER INHERIT]
-
-* GRANT <privileges_list | ALL PRIVILEGES> ON <table_name> TO <user>
-* GRANT <privileges_list | ALL PRIVILEGES> ON <table_name> TO <user | group | role> WITH GRANT OPTION -- permitir que los hijos hereden sus props
-* GRANT <group_privileges> TO <suer>;
-* GRANT UPDATE <table_field> ON TABLE <table_name> TO <user>;
-
-privileges_list = [SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES TRIGGER CREATE CONNECT TEMPORARY EXECUTE USAGE ALL]
-
-* REVOKE <privileges_list | ALL> ON <table_name> FROM [user, group, role] [CASCADE]
-
-* DROP OWNED BY <user>; -- quitar todas las relaciones que pueda tener un usuario para poder ser eliminado
-* DROP USER <user>; -- elimarn usuario
-
-
-DML
-* SELECT <columns> FROM <table_name> WHERE [condition];
-* INSERT INTO <table_name> (column1, column2, column3) VALUES (value1, value2, value3);
-* INSERT INTO <table_name_1> (column1, column2, column3) SELECT column1, column2, column3 FROM <table_name_2> WHERE [condition];
-
-* UPDATE <table_name> SET column1 = value1, column2 = value2...., columnN = valueN WHERE [condition];
-
-* DELETE FROM <table_name> WHERE [condition];
-
-* SELECT <columns>, COUNT(colum_a) FROM <table_name_1>
-JOIN <table_name_2> USING(colum_b)
-WHERE [condition]
-GROUP BY colum_a
-HAVING COUNT(colum_a) > (SELECT COUNT(colum_a) FROM <table_name_3> 
-WHERE [condition]
-ORDER BY colum_c [ASC | DESC];
-
-
-Transiciones SQL proporciona las siguientes funciones agregadas:
-APPROX_COUNT_DISTINCT
-AVG
-CHECKSUM_AGG
-COUNT
-COUNT_BIG
-GROUPING
-GROUPING_ID
-MAX
-MIN
-STDEV
-STDEVP
-STRING_AGG
-SUM
-VAR
-VARP
-
-
-CREATE FUNCTION <function_name>(.....)
-DECLARE
-
-<variables locales> <type> = <value>
-
-
-BEGIN
-  <instruction blocks>
-END;
-
-   
-IF <CONDITION>
-    THEN
-      <instruction blocks>
-    ELSE EXIT;
-END IF;
-
-WHILE counter <= 100 LOOP
-
-END LOOP;
-
-
-
-CREATE VIEW <view_name> (<params>)
-AS <query>
-
--- TRIGGERS
-
--- Sintaxis de una funcion trigger
-CREATE FUNCTION <trigger_function_name>()
-    RETURNS trigger
-    LANGUAGE 'plpgsql'
-AS $$
-DECLARE
-
-BEGIN
-
-END;
-$$;
-
-
--- Sintaxis de un trigger
-CREATE TRIGGER <trigger_name> 
-	[BEFORE | AFTER | INSTEAD OF] 
-	[INSERT OR UPDATE OR DELETE OR TRUNCATE] 
-ON <table_name>
-
-FOR EACH ROW
-<query> | EXECUTE PROCEDURE <function_trigger>();
-
-
----------------------------------------------------------------------------------------------------------------------
-RESPUESTAS DE LA 2PP DE SBD
+-- **************************************************************************************************
+-- RESPUESTAS DE LA 2PP DE SBD
+-- **************************************************************************************************
 1-
   a) CREATE USER candidato WITH CREATEROLE;
      GRANT SELECT, INSERT, UPDATE, DELETE ON medico TO candidato;
@@ -369,16 +380,9 @@ SELECT public."asignarMedicoAMision"(
 
 
 
-
-
-
-
-
-
-
-
-
---++++++++++++++++++++++++++++++++++
+-- **************************************************************************************************
+-- Ejemplo práctico II
+-- **************************************************************************************************
 CREATE TABLE products (
     name varchar(20),
 	amount smallint,
@@ -465,10 +469,3 @@ LANGUAGE 'plpgsql';
 CREATE TRIGGER productAudit AFTER INSERT OR UPDATE OR DELETE
 ON products
 FOR EACH ROW EXECUTE PROCEDURE productAudit();
-
-
-
-
-
-
-
